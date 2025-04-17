@@ -22,4 +22,9 @@ public class ScheduleTest {
     public void testCron() {
         System.out.println("startCron: " + new Date());
     }
+
+    @Scheduled(initialDelay = 3000, fixedRate = 5000)
+    public void testRateWithInitialDelay() {
+        System.out.println("startRate: " + new Date());
+    }
 }
