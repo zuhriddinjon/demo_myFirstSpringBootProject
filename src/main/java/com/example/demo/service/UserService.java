@@ -5,7 +5,7 @@ import com.example.demo.dto.UpdateUserRequest;
 import com.example.demo.dto.UserDto;
 import com.example.demo.dto.CreateUserRequest;
 import com.example.demo.exception.UserNotFoundException;
-import com.example.demo.model.User;
+import com.example.demo.model.UserEntity;
 import com.example.demo.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class UserService {
 
     public ApiResponse<List<UserDto>> getAllUsers() {
         try {
-            List<User> users = userRepository.findAll();
+            List<UserEntity> users = userRepository.findAll();
             List<UserDto> userDtos = users.stream()
                     .map(user -> new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()))
                     .collect(Collectors.toList());
@@ -42,7 +42,7 @@ public class UserService {
 
     public ApiResponse<UserDto> getUserById(Long id) {
         try {
-            User user = userRepository.findById(id)
+            UserEntity user = userRepository.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("Foydalanuvchi topilmadi: " + id));
 
             return ApiResponse.success(200, "Foydalanuvchi topildi", new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()));
@@ -54,7 +54,7 @@ public class UserService {
 
     public ApiResponse<UserDto> createUser(CreateUserRequest userDto) {
         try {
-            User user = new User();
+            UserEntity user = new UserEntity();
             user.setEmail(userDto.email());
             user.setFirstName(userDto.name());
             user.setDataOfBirth(userDto.birthDate());
@@ -69,10 +69,10 @@ public class UserService {
 
     public ApiResponse<UserDto> updateUser(Long id, UpdateUserRequest userRequest) {
         try {
-            Optional<User> userOptional = userRepository.findById(id);
+            Optional<UserEntity> userOptional = userRepository.findById(id);
             userOptional.orElseThrow(() -> new UserNotFoundException("Foydalanuvchi topilmadi: " + id));
             if (userOptional.isPresent()) {
-                User user = userOptional.get();
+                UserEntity user = userOptional.get();
                 user.setFirstName(userRequest.name());
                 user.setEmail(userRequest.email());
                 user.setDataOfBirth(userRequest.birthDate());
