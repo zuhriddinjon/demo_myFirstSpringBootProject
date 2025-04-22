@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.CreateUserRequest;
+import com.example.demo.dto.UpdateUserRequest;
 import com.example.demo.dto.UserDto;
-import com.example.demo.dto.UserUpdateRequest;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,13 +32,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserDto>> createUser(@RequestBody UserDto UserDto) {
-        return ResponseEntity.ok(userService.createUser(UserDto));
+    public ResponseEntity<ApiResponse<UserDto>> createUser(@Validated @RequestBody CreateUserRequest user) {
+        return ResponseEntity.ok(userService.createUser(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable Long id, @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
-        return ResponseEntity.ok(userService.updateUser(id, new UserDto(id, userUpdateRequest.name(), userUpdateRequest.email())));
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable Long id, @Validated @RequestBody UpdateUserRequest user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
     @DeleteMapping("/{id}")

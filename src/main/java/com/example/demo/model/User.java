@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -25,7 +27,7 @@ public class User {
     @Column(name = "gender", nullable = false, length = 10)
     private String gender;
     @Column(name = "date_of_birth", nullable = false)
-    private String dataOfBirth;
+    private LocalDate dataOfBirth;
     @Column(name = "country", nullable = false, length = 50)
     private String country;
 }

@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.UpdateUserRequest;
 import com.example.demo.dto.UserDto;
+import com.example.demo.dto.CreateUserRequest;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
@@ -28,7 +30,7 @@ public class UserService {
         try {
             List<User> users = userRepository.findAll();
             List<UserDto> userDtos = users.stream()
-                    .map(user -> new UserDto(user.getId(), user.getFirstName(), user.getEmail()))
+                    .map(user -> new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()))
                     .collect(Collectors.toList());
 
             return ApiResponse.success(200, "Barcha foydalanuvchilar", userDtos);
@@ -43,37 +45,39 @@ public class UserService {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("Foydalanuvchi topilmadi: " + id));
 
-            return ApiResponse.success(200, "Foydalanuvchi topildi", new UserDto(user.getId(), user.getFirstName(), user.getEmail()));
+            return ApiResponse.success(200, "Foydalanuvchi topildi", new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()));
         } catch (Exception e) {
             logger.error("Xatolik yuz berdi: {}", e.getMessage(), e);
             return ApiResponse.error(500, "Server xatosi");
         }
     }
 
-    public ApiResponse<UserDto> createUser(UserDto userDto) {
+    public ApiResponse<UserDto> createUser(CreateUserRequest userDto) {
         try {
             User user = new User();
-            user.setEmail(userDto.getEmail());
-            user.setFirstName(userDto.getName());
+            user.setEmail(userDto.email());
+            user.setFirstName(userDto.name());
+            user.setDataOfBirth(userDto.birthDate());
             userRepository.save(user);
 
-            return ApiResponse.success(200, "Foydalanuvchi yaratildi", new UserDto(user.getId(), user.getFirstName(), user.getEmail()));
+            return ApiResponse.success(200, "Foydalanuvchi yaratildi", new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()));
         } catch (Exception e) {
             logger.error("Xatolik yuz berdi: {}", e.getMessage(), e);
             return ApiResponse.error(500, "Foydalanuvchi yaratishda xatolik");
         }
     }
 
-    public ApiResponse<UserDto> updateUser(Long id, UserDto userDTO) {
+    public ApiResponse<UserDto> updateUser(Long id, UpdateUserRequest userRequest) {
         try {
             Optional<User> userOptional = userRepository.findById(id);
             userOptional.orElseThrow(() -> new UserNotFoundException("Foydalanuvchi topilmadi: " + id));
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
-                user.setFirstName(userDTO.getName());
-                user.setEmail(userDTO.getEmail());
+                user.setFirstName(userRequest.name());
+                user.setEmail(userRequest.email());
+                user.setDataOfBirth(userRequest.birthDate());
                 userRepository.save(user);
-                return ApiResponse.success(200, "Foydalanuvchi yangilandi", new UserDto(user.getId(), user.getFirstName(), user.getEmail()));
+                return ApiResponse.success(200, "Foydalanuvchi yangilandi", new UserDto(user.getId(), user.getFirstName(), user.getEmail(), user.getDataOfBirth()));
             }
             return ApiResponse.error(404, "Foydalanuvchi topilmadi");
         } catch (Exception e) {
