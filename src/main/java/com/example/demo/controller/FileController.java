@@ -3,6 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.model.FileEntity;
 import com.example.demo.service.FileService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,10 +26,15 @@ public class FileController {
         return ResponseEntity.ok(fileService.saveFile(file));
     }
 
-
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<?> downloadFile(@PathVariable Long fileId) {
-        return fileService.getFileById(fileId);
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+        FileEntity fileEntity = fileService.getFileById(fileId);
+        Resource resource = fileService.downloadFile(fileId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(fileEntity.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getName() + "\"")
+                .body(resource);
     }
 
 }
